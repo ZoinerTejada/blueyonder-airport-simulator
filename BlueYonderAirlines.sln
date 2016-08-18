@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirportSimulatorConsole", "AirportSimulatorConsole\AirportSimulatorConsole.csproj", "{54B2168B-4894-4197-9158-78B50A072B05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sensors", "Sensors\Sensors.csproj", "{6F0DF458-66D0-4572-A03C-076486C6FAFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSensorConsole", "TempSensorConsole\SimpleSensorConsole.csproj", "{4E249F75-F2C5-4756-B257-10D7D97CB8A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{54B2168B-4894-4197-9158-78B50A072B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54B2168B-4894-4197-9158-78B50A072B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54B2168B-4894-4197-9158-78B50A072B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54B2168B-4894-4197-9158-78B50A072B05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F0DF458-66D0-4572-A03C-076486C6FAFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F0DF458-66D0-4572-A03C-076486C6FAFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F0DF458-66D0-4572-A03C-076486C6FAFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F0DF458-66D0-4572-A03C-076486C6FAFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E249F75-F2C5-4756-B257-10D7D97CB8A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E249F75-F2C5-4756-B257-10D7D97CB8A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E249F75-F2C5-4756-B257-10D7D97CB8A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E249F75-F2C5-4756-B257-10D7D97CB8A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
