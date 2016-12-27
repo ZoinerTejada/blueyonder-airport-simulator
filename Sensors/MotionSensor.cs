@@ -1,15 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sensors
 {
-    public class MotionSensor: SensorBase
+    public class MotionSensor : SensorBase
     {
-        public MotionSensor(string deviceId, Action<string> transmitHandler): base(deviceId, transmitHandler)
+        public MotionSensor(string deviceId, Action<string> transmitHandler) : base(deviceId, transmitHandler)
         {
         }
 
@@ -29,7 +26,7 @@ namespace Sensors
             int lastDepartureHour = 23; //hour 23 is 11pm
             int minutesBetweenFlights = 90;
 
-            Random rng = new Random();
+            Random random = new Random();
 
             MotionDataPoint datapoint = new MotionDataPoint()
             {
@@ -50,11 +47,11 @@ namespace Sensors
             {
                 if (IsWithinPreFlightWindow(i, reportingIntervalSeconds, nextDepartureIntervalNumber))
                 {
-                    datapoint.activityDetected = rng.Next(0, 100) >= 10; 
+                    datapoint.activityDetected = random.Next(0, 100) >= 10;
                 }
                 else if (IsWithinPostFlightWindow(i, reportingIntervalSeconds, nextDepartureIntervalNumber))
                 {
-                    datapoint.activityDetected = rng.Next(0, 100) >= 70;
+                    datapoint.activityDetected = random.Next(0, 100) >= 70;
                 }
                 else
                 {
@@ -69,13 +66,13 @@ namespace Sensors
                 //set a time for the next departure
                 if (HasPlaneDeparted(i, reportingIntervalSeconds, nextDepartureIntervalNumber))
                 {
-                    nextDepartureIntervalNumber += minutesBetweenFlights * 60 / reportingIntervalSeconds; 
+                    nextDepartureIntervalNumber += minutesBetweenFlights * 60 / reportingIntervalSeconds;
 
                     //e.g., last flight departs at 11 pm
                     if (nextDepartureIntervalNumber * reportingIntervalSeconds >= lastDepartureHour * 60 * 60)
                     {
                         // set the departure to a number in a future day we won't reach
-                        nextDepartureIntervalNumber = 30 * 60 * 60 / reportingIntervalSeconds; 
+                        nextDepartureIntervalNumber = 30 * 60 * 60 / reportingIntervalSeconds;
                     }
                 }
             }
@@ -85,34 +82,20 @@ namespace Sensors
         private bool IsWithinPreFlightWindow(int intervalNumber, int reportingInterval, int departureIntervalNumber)
         {
             //Pre-flight window is 30 minutes before departure
-            if ((intervalNumber * reportingInterval) >= (departureIntervalNumber * reportingInterval) - (30*60) &&
-                (intervalNumber * reportingInterval) < (departureIntervalNumber * reportingInterval))
-            {
-                return true;
-            }
-
-            return false;
+            return (intervalNumber * reportingInterval) >= (departureIntervalNumber * reportingInterval) - (30 * 60) &&
+                   (intervalNumber * reportingInterval) < (departureIntervalNumber * reportingInterval);
         }
 
         private bool IsWithinPostFlightWindow(int intervalNumber, int reportingInterval, int departureIntervalNumber)
         {
             //Post-Flight window lasts from departure to 30 minutes after
-            if ((intervalNumber * reportingInterval) >= (departureIntervalNumber * reportingInterval)  &&
-                (intervalNumber * reportingInterval) < (departureIntervalNumber * reportingInterval) + (30 * 60))
-            {
-                return true;
-            }
-
-            return false;
+            return (intervalNumber * reportingInterval) >= (departureIntervalNumber * reportingInterval) &&
+                   (intervalNumber * reportingInterval) < (departureIntervalNumber * reportingInterval) + (30 * 60);
         }
 
         private bool HasPlaneDeparted(int intervalNumber, int reportingInterval, int departureIntervalNumber)
         {
-            if (intervalNumber * reportingInterval > departureIntervalNumber * reportingInterval + 30 * 60)
-            {
-                return true;
-            }
-            return false;
+            return intervalNumber * reportingInterval > departureIntervalNumber * reportingInterval + 30 * 60;
         }
 
         private class MotionDataPoint
@@ -121,6 +104,5 @@ namespace Sensors
             public DateTime createDate;
             public string deviceId;
         }
-
     }
 }
