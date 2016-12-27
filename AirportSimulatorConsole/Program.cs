@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +12,6 @@ namespace AirportSimulatorConsole
 {
     class Program
     {
-        static string eventHubName = "blueyonderairports";
-        static string connectionString = "Endpoint=sb://blueyonderairports-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=2c3Q0+TBHQrN6fJy5zh9sRpfG2tNFa3JdQqo87XZ0L8=";
         static int numDevices = 41525;
         static int delayIntervalMS = 10000;
         static int numMessagesPerInterval = 9368;
@@ -73,9 +72,12 @@ namespace AirportSimulatorConsole
             senders = new List<EventHubClient>(numSenders);
             Console.WriteLine($"Creating {numSenders} batch senders handling {estimatedNumMessagesPerBatch} messages each...");
 
+            var eventHubConnectionString = ConfigurationManager.AppSettings["eventHubConnectionString"];
+            var eventHubName = ConfigurationManager.AppSettings["eventHubName"];
+
             for (int i = 0; i < numSenders; i++)
             {
-                EventHubClient client = EventHubClient.CreateFromConnectionString(connectionString, eventHubName);
+                EventHubClient client = EventHubClient.CreateFromConnectionString(eventHubConnectionString, eventHubName);
                 senders.Add(client);
             }
 
