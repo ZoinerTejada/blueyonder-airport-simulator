@@ -47,3 +47,5 @@ build.log
 
 #dropbox
 .DS_Store
+/*/bin/Debug
+/*/obj/Debug
