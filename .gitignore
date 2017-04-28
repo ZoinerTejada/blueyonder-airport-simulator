@@ -19,7 +19,7 @@ syntax: glob
 *.iml
 
 #visual studio
-*.suo
+.suo
 
 # building
 target
@@ -46,4 +46,4 @@ packages
 build.log
 
 #dropbox
-*.DS_Store
+.DS_Store
