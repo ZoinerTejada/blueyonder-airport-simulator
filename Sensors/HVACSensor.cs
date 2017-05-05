@@ -1,15 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sensors
 {
-    public class HVACSensor: SensorBase
+    public class HVACSensor : SensorBase
     {
-        public HVACSensor(string deviceId, Action<string> transmitHandler): base(deviceId, transmitHandler)
+        public HVACSensor(string deviceId, Action<string> transmitHandler) : base(deviceId, transmitHandler)
         {
         }
 
@@ -35,7 +32,6 @@ namespace Sensors
             int numDataPointsPerDay = 24 * 60 * 60 / reportingIntervalSeconds;
             int lastActivationInterval = 0;
 
-
             datapoints = new List<string>(24 * 60 * 60 / reportingIntervalSeconds);
 
             //i = 0 means midnight
@@ -55,29 +51,17 @@ namespace Sensors
 
                 //prepare the time of the next event
                 datapoint.createDate = datapoint.createDate.AddSeconds(reportingIntervalSeconds);
-
             }
-
         }
 
         private bool IsAtScheduledActivationMilestone(int intervalNumber, int reportingInterval)
         {
-            if (intervalNumber * reportingInterval % (60 * 60) == 0)
-            {
-                return true;
-            }
-
-            return false;
+            return intervalNumber * reportingInterval % (60 * 60) == 0;
         }
 
         private bool IsAtScheduledDeactivationMilestone(int intervalNumber, int reportingInterval, int lastActivationInterval, int runDurationMinutes)
         {
-            if (intervalNumber * reportingInterval == lastActivationInterval * reportingInterval + runDurationMinutes * 60)
-            {
-                return true;
-            }
-
-            return false;
+            return intervalNumber * reportingInterval == lastActivationInterval * reportingInterval + runDurationMinutes * 60;
         }
 
         private enum ActivationState
@@ -95,6 +79,5 @@ namespace Sensors
             public DateTime createDate;
             public string deviceId;
         }
-
     }
 }

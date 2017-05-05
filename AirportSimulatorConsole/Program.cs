@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,14 +12,12 @@ namespace AirportSimulatorConsole
 {
     class Program
     {
-        static string eventHubName = "blueyonderairports";
-        static string connectionString = "Endpoint=sb://blueyonderairports-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=2c3Q0+TBHQrN6fJy5zh9sRpfG2tNFa3JdQqo87XZ0L8=";
         static int numDevices = 41525;
         static int delayIntervalMS = 10000;
         static int numMessagesPerInterval = 9368;
 
         static System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        static Random rng = new Random();
+        static Random random = new Random();
         static List<string> devices;
         static List<EventHubClient> senders;
         static List<EventData> messages;
@@ -30,11 +29,11 @@ namespace AirportSimulatorConsole
         static void Main(string[] args)
         {
             Console.WriteLine("Press Ctrl-C to stop the sender process");
-            
+
             InitDevices();
 
             InitClients();
-            
+
             PrepareMessages();
 
             Console.WriteLine("Press Enter to start sending now");
@@ -58,7 +57,7 @@ namespace AirportSimulatorConsole
             //Approximate the size of a message
             var message = new
             {
-                temp = rng.Next(60, 78),
+                temp = random.Next(60, 78),
                 createDate = DateTime.UtcNow,
                 deviceId = devices[0]
             };
@@ -67,17 +66,18 @@ namespace AirportSimulatorConsole
             EventData eventData = new EventData(Encoding.UTF8.GetBytes(jsonMessage));
             estimatedMessageSize = eventData.SerializedSizeInBytes;
 
-            numSenders = (int)Math.Ceiling((double) numMessagesPerInterval * estimatedMessageSize / (256*1024)) ;
-            estimatedNumMessagesPerBatch = (int) Math.Ceiling( (double) (256 * 1024) / estimatedMessageSize );
+            numSenders = (int)Math.Ceiling((double)numMessagesPerInterval * estimatedMessageSize / (256 * 1024));
+            estimatedNumMessagesPerBatch = (int)Math.Ceiling((double)(256 * 1024) / estimatedMessageSize);
 
             senders = new List<EventHubClient>(numSenders);
-            EventHubClient client;
+            Console.WriteLine($"Creating {numSenders} batch senders handling {estimatedNumMessagesPerBatch} messages each...");
 
-            Console.WriteLine("Creating {0} batch senders handling {1} messages each...", numSenders, estimatedNumMessagesPerBatch);
+            var eventHubConnectionString = ConfigurationManager.AppSettings["eventHubConnectionString"];
+            var eventHubName = ConfigurationManager.AppSettings["eventHubName"];
 
             for (int i = 0; i < numSenders; i++)
             {
-                client = EventHubClient.CreateFromConnectionString(connectionString, eventHubName);
+                EventHubClient client = EventHubClient.CreateFromConnectionString(eventHubConnectionString, eventHubName);
                 senders.Add(client);
             }
 
@@ -87,19 +87,19 @@ namespace AirportSimulatorConsole
         static void PrepareMessages()
         {
             messages = new List<EventData>(numMessagesPerInterval);
-            DateTime createDate;
+            DateTime batchCreationDate;
             EventData eventData;
 
             //Pre-create messages
             Console.WriteLine("Preparing messages...");
-            createDate = DateTime.UtcNow; //simulate all events in batch having same timestamp
+            batchCreationDate = DateTime.UtcNow; //simulate all events in batch having same timestamp
 
             for (int i = 0; i < numMessagesPerInterval; i++)
             {
                 var message = new
                 {
-                    temp = rng.Next(60, 78),
-                    createDate = DateTime.UtcNow,
+                    temp = random.Next(60, 78),
+                    createDate = batchCreationDate,
                     deviceId = devices[i % numSenders]
                 };
 
@@ -124,18 +124,17 @@ namespace AirportSimulatorConsole
                 {
                     int numComplete = 0;
 
-
                     for (int i = 0; i < senders.Count; i++)
                     {
                         try
                         {
-                            int numMessagesToSend = i == senders.Count - 1 ? (int)(messages.Count - i * estimatedNumMessagesPerBatch) : estimatedNumMessagesPerBatch;
-                            Console.WriteLine("{0}: Sending batch {1} of size {2} messages...", DateTime.Now, i, numMessagesToSend);
-                            Task t = senders[i].SendBatchAsync(messages.GetRange((int)i * estimatedNumMessagesPerBatch, numMessagesToSend));
-                            t.ContinueWith((a) =>
+                            int numMessagesToSend = i == senders.Count - 1 ? messages.Count - i * estimatedNumMessagesPerBatch : estimatedNumMessagesPerBatch;
+                            Console.WriteLine($"{DateTime.Now}: Sending batch {i} of size {numMessagesToSend} messages...");
+                            Task task = senders[i].SendBatchAsync(messages.GetRange(i * estimatedNumMessagesPerBatch, numMessagesToSend));
+                            task.ContinueWith((a) =>
                             {
                                 Interlocked.Increment(ref numComplete);
-                                Console.WriteLine("{0}: Completed batch", DateTime.Now);
+                                Console.WriteLine($"{DateTime.Now}: Completed batch");
                             });
                         }
                         catch (Exception e)
@@ -161,15 +160,13 @@ namespace AirportSimulatorConsole
 
                 Console.WriteLine("Waiting for interval...");
                 Thread.Sleep(delayIntervalMS);
-
             }
-           
         }
 
         private static void LogError(String message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("{0} > Exception {1}", DateTime.Now, message);
+            Console.WriteLine($"{DateTime.Now} > Exception {message}");
             Console.ResetColor();
         }
     }

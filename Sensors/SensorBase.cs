@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sensors
@@ -13,11 +11,8 @@ namespace Sensors
         protected List<string> datapoints;
         protected int reportingIntervalSeconds;
 
-        public int CountOfDataPoints
-        {
-            get { return datapoints.Count; }
-        }
-        
+        public int CountOfDataPoints => datapoints.Count;
+
         protected SensorBase(string deviceId, Action<string> transmitHandler)
         {
             this.deviceId = deviceId;
